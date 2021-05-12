@@ -1,47 +1,41 @@
 import { Injectable,NotFoundException } from "@nestjs/common";
-import {Product} from "./product.model"
+import { InjectRepository } from "@nestjs/typeorm";
+import { timeStamp } from "console";
+import { DeleteResult, Repository, UpdateResult } from "typeorm";
+import { CreatedProductDto } from "./DTO/create.product.dto";
+import { UpdateProductDto } from "./DTO/update.product.dto";
+import {Product} from "./product.entity"
 @Injectable()
 export class ProductsService{
-    private products:Product[]=[];
-    insertProduct(title:string,desc:string,price:number){
-        const prodId=Math.random().toString();
-        const newProduct=new Product(prodId,title,desc,price);
-        this.products.push(newProduct);
-        return prodId
+    constructor(
+        @InjectRepository(Product)
+        private productRepository:Repository<Product>
+    ){}
+    async createProduct(product :CreatedProductDto){
+        this.productRepository.save(product);
     }
-    getProducts(){
-        return [...this.products]
+    async getProducts():Promise<Product[]>{
+        return await this.productRepository.find();
     }
-    getProduct(productId:string){
-        const product=this.findProduct(productId)[0];
-        return {...product};
+    async getProduct(id:number):Promise<Product>{
+        return await this.productRepository.findOne(id);
     }
-    updateProduct(productId:string,title:string,desc:string,price:number){
-        const [product,index]=this.findProduct(productId);
-        const updatedProduct={...product};
-        if(title){
-            updatedProduct.title=title;
+    async updateProduct(id:number,product:UpdateProductDto){
+        const updatedProduct = await this.productRepository.findOne(id);
+        if(!updatedProduct){
+            throw new NotFoundException(`No product whith id=${id}!`)
         }
-        if(desc){
-            updatedProduct.description=desc;
+        await this.productRepository.update(id,product);
+        return ({message:"Product updated succesfully"})
+    }
+    async delete(id:number){
+        const exists=await this.productRepository.findOne(id);
+        if(!exists)
+        {
+            throw new NotFoundException(`No product whith id=${id}!`)
         }
-        if(price){
-            updatedProduct.price=price;
-        }
-        this.products[index]=updatedProduct;
-        return null;
+        await this.productRepository.delete(id);
+        return ({message:"Product deleted succesfully"})
     }
-    deleteProduct(prodId:string){
-        const productIndex=this.findProduct(prodId)[1];
-        this.products.splice(productIndex,1);
-        return null
-    }
-    private findProduct(productId:string):[Product,number]{
-        const productIndex=this.products.findIndex((prod)=>prod.id==productId)
-        const product=this.products[productIndex];
-        if(!product)
-            throw new NotFoundException("Nu s-a gasit produsul");
-        else 
-            return [product,productIndex];
-    }
+    
 }
