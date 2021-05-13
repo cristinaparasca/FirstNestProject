@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Product } from "src/products/product.entity";
 
 export class CreatedUserDto{
     @IsString()
@@ -20,4 +21,8 @@ export class CreatedUserDto{
     @IsString()
     @IsOptional()
     gender:string
+
+    productsId:number[]
+    products:Product[]
+
 }

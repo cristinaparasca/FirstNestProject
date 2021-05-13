@@ -9,7 +9,7 @@ export class UserController{
     constructor(private readonly userService:UserService){};
     @Post()
     create(@Body() user:CreatedUserDto){
-        this.userService.create(user);
+        return this.userService.create(user);
     }
     @Get()
     findAll(){

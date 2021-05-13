@@ -1,5 +1,6 @@
 import { BaseEntity } from "src/base.entity";
-import { Column, Entity } from "typeorm";
+import { Product } from "src/products/product.entity";
+import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
 
 @Entity('users')
 export class User extends BaseEntity{
@@ -17,4 +18,7 @@ export class User extends BaseEntity{
 
     @Column({nullable:true})
     gender:string
+    @ManyToMany(()=>Product,{onUpdate:'CASCADE',onDelete:'CASCADE'})
+    @JoinTable()
+    products:Product[];
 }
