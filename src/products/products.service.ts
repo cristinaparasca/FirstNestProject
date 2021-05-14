@@ -24,20 +24,17 @@ export class ProductsService{
         return product;
     }
     async updateProduct(id:number,product:UpdateProductDto){
-        const updatedProduct = await this.productRepository.findOne(id);
-        if(!updatedProduct){
+        const updateResult=await this.productRepository.update(id,product);
+        if(!updateResult.affected){
             throw new NotFoundException(`No product whith id=${id}!`)
         }
-        await this.productRepository.update(id,product);
         return ({message:"Product updated succesfully"})
     }
     async delete(id:number){
-        const exists=await this.productRepository.findOne(id);
-        if(!exists)
-        {
-            throw new NotFoundException(`No product whith id=${id}!`)
+        const deleteresult=await this.productRepository.delete(id);
+        if(!deleteresult.affected){
+            throw new NotFoundException(`No product whith id=${id}!`);
         }
-        await this.productRepository.delete(id);
         return ({message:"Product deleted succesfully"})
     }
     

@@ -52,17 +52,15 @@ export class UserService{
                 user.products.push(product);
             }
         }
-        
         delete user.productsId;
         await this.usersRepository.update(id,user);
         return {message:"User updated succesfully!"}
     }
     async delete(id:number){
-        const exist=await this.usersRepository.findOne(id)
-        if(!exist){
+        const deleteResult=await this.usersRepository.delete(id);
+        if(!deleteResult.affected){
             throw new NotFoundException(`No user with id=${id}`);
         }
-        await this.usersRepository.delete(id);
         return {message:"User deleted succesfully!"}
     }
 }
